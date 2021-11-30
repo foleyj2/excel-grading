@@ -1,6 +1,7 @@
 # excel-grading
 Overview: Macros, scripts, and sundry for those using Excel to do grading in courses
-
+Author:  Joseph Timothy Foley <foley AT RU dot IS> <foley AT MIT dot EDU>
+  
 As a teacher at Reykjavík University, I find myself using Microsoft Excel often to give detailed feedback to students about their assignments.
 To keep myself sane and eliminate repetitive tasks, I developed VBA code and scripts to make this easier.
 In particular, it is helpful if you setup a template grading sheet, then use the macros to auto-fill and create tabs for each student/team.
