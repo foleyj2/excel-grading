@@ -10,7 +10,7 @@ Attribute VB_Exposed = True
 ''Excel VBA Grading Sheet Macros
 ''MIT License
 
-''Copyright (c) 2021 Joseph Timothy Foley <foley AT RU dot IS>
+''Copyright (c) 2022 Joseph Timothy Foley <foley AT RU dot IS>
 ''
 ''Permission is hereby granted, free of charge, to any person obtaining a copy
 ''of this software and associated documentation files (the "Software"), to deal
@@ -163,16 +163,15 @@ Sub SortWorksheetsTabs()
     Application.ScreenUpdating = True
 End Sub
 
-Sub MakeSheetInstance(CreationIndex As Integer)
+Sub MakeSheetInstance(CreationIndex As Integer, name As String)
     'Copy the template sheet to another location
+    'Modes:  'query' (default), '
     Call InitGlobals
     Dim templatews As Worksheet
-    Dim name As String
     Dim myCellSetValue As Range
     Set templatews = WBdata.Sheets(1)
     ' Adjust above if you need to change the template but should be at the beginning
     ' TODO: search for first sheet named template
-    name = InputBox("Sheet Name")
     With WBdata
         templatews.Copy After:=.Sheets(CreationIndex)
         .ActiveSheet.name = name
@@ -183,11 +182,15 @@ End Sub
 
 Sub MakeSheetInstanceEnd()
     Call InitGlobals
-    Call MakeSheetInstance(WBdata.Sheets.Count)
+    Dim name As String
+    name = InputBox("Sheet Name")
+    Call MakeSheetInstance(WBdata.Sheets.Count, name)
 End Sub
 
 Sub MakeSheetInstanceNext()
     Call InitGlobals
+    Dim name As String
+    name = InputBox("Sheet Name")
     Call MakeSheetInstance(WBdata.ActiveSheet.Index)
 End Sub
 
