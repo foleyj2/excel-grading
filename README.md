@@ -34,4 +34,13 @@ You might be able to output the entire workbook and use a PDF editor to split it
 
 *TODO: develop workflow with Office360 so I can spend more time in linux instead of windows*
 
+
+# xlwings and TriggerVBA
+I need to start doing multiple-sheet automation and the VBA interface is painful.
+Triggering VBA from python:  https://towardsdatascience.com/how-to-supercharge-excel-with-python-726b0f8e22c2
+First install Anaconda on Windows to make your life easier.
+The directions say you need to install the addin, but the xlwings menu showed up without it in 2022.
+
+
+
 Enjoy!
