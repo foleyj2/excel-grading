@@ -26,30 +26,23 @@ class ExcelMerge():
         self.outpath = outpath
         self.workbook = openpyxl.load_workbook(filename=outpath)
 
-    def dupsheet(self, name):
-        "Assume first sheet is template, copy to the end.  Return sheet"
+    def makenamedsheet(self, name, cell="B2"):
+        "Assume first sheet is template, copy to the end and put name"
         workbook = self.workbook
         template_sheet = workbook.active
         ws = workbook.copy_worksheet(template_sheet)
         ws.title = name
-        return ws
-
-    def insertname(self, name, cell="B2"):
-        "put name in the cell"
-        # assume active sheet is the right one
-        ws = self.workbook.active
         ws[cell] = name
+
 
     def merge(self):
         "do the merge!"
-        with open(self.data, "r") as datafile:
+        with open(self.data, "r", encoding="utf-8") as datafile:
             for line in datafile:
                 line = line.strip()
                 self.logger.info(f"Creating sheet {line}")
-                self.dupsheet(line)
-                self.insertname(line)
-            
-    
+                self.makenamedsheet(line)
+
     def save(self):
         "save the output"
         self.logger.debug(f"Saving to {self.outpath}")
