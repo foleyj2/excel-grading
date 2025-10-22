@@ -4,17 +4,56 @@
 """Prepare an excel grading template for multiple students"""
 import os
 import sys
+import shutil
 from pathlib import PurePath##https://docs.python.org/3/library/pathlib.html#module-pathlib
 import argparse
 import logging
 import openpyxl
+import copy
 ##sudo dnf5 install python3-openpyxl
 
-class SheetPrepper():
-    """XLSX sheet preparation"""
-    def __init__(self, infd, logger):
-        self.logger = logger       
+class ExcelMerge():
+    """XLSX sheet merge"""
+    def __init__(self, template, data, logger):
+        # first we copy the template to the output
+        inpath = PurePath(template)
+        outpath = inpath.stem+"-merged"+inpath.suffix
+        shutil.copy2(template, outpath)
+        logger.info(f"Output: {outpath}")
+        self.template = template
+        self.data = data
+        self.logger = logger
+        self.outpath = outpath
+        self.workbook = openpyxl.load_workbook(filename=outpath)
 
+    def dupsheet(self, name):
+        "Assume first sheet is template, copy to the end.  Return sheet"
+        workbook = self.workbook
+        template_sheet = workbook.active
+        ws = workbook.copy_worksheet(template_sheet)
+        ws.title = name
+        return ws
+
+    def insertname(self, name, cell="B2"):
+        "put name in the cell"
+        # assume active sheet is the right one
+        ws = self.workbook.active
+        ws[cell] = name
+
+    def merge(self):
+        "do the merge!"
+        with open(self.data, "r") as datafile:
+            for line in datafile:
+                line = line.strip()
+                self.logger.info(f"Creating sheet {line}")
+                self.dupsheet(line)
+                self.insertname(line)
+            
+    
+    def save(self):
+        "save the output"
+        self.logger.debug(f"Saving to {self.outpath}")
+        self.workbook.save(self.outpath)
 
 def main():
     """Main program loop"""
@@ -23,7 +62,7 @@ def main():
         description="Generate xlsx grading sheet from template")
     parser.add_argument('template',
                         help="Excel spreadsheet template .xlsx")
-    parser.add_argument('studentnames',
+    parser.add_argument('data',
                         help="text file with student names")
     ## TODO:  Fix verbosity based upon another argument and logging
     parser.add_argument('--log', default="INFO",
@@ -38,7 +77,7 @@ def main():
     logger = logging.getLogger("app")
     logger.setLevel(numeric_level)
     # log everything to file
-    logpath = os.path.splitext(args.filename)[0]+".log"
+    logpath = os.path.splitext(args.template)[0]+".log"
     fh = logging.FileHandler(logpath)
     fh.setLevel(logging.DEBUG)
     # log to console
@@ -53,16 +92,12 @@ def main():
     logger.addHandler(ch)
     logger.addHandler(fh)
 
-    logger.info("Creating Peerwise2TeX log file %s", logpath)
+    logger.info("Creating prepsheet log file %s", logpath)
 
     # filename pre-processing for output
-    inpath = PurePath(args.filename)
-    print(f"Input: {inpath}")
-    input = open(inpath, "r")
-    SP = SheetPrepper(input, logger)
-    outstem = inpath.stem+"-"+tag
-    logger.info("Output: %s.pdf" % outstem)
-
+    SP = ExcelMerge(args.template, args.data, logger)
+    SP.merge()
+    SP.save()
     
 if __name__ == "__main__":
   main()
