@@ -5,7 +5,7 @@ ENDPREAMBLE
 FOR1 Basic deduction
 FOR2(-2) Deductions (negative)
 FOR3(2) Deduction (still negative)
-FOR4=10 Set value
+FOR4(=10) Set value
 PRO1(*) Deduct all points
 CITE! Basic penalty
 LATE!(2) Double penalty
