@@ -14,19 +14,20 @@ import copy
 
 class ExcelMerge():
     """XLSX sheet merge"""
-    def __init__(self, template, data, logger):
+    def __init__(self, template, data, logger, cell):
         # first we copy the template to the output
         inpath = PurePath(template)
         outpath = inpath.stem+"-merged"+inpath.suffix
         shutil.copy2(template, outpath)
         logger.info(f"Output: {outpath}")
         self.template = template
+        self.cell = cell
         self.data = data
         self.logger = logger
         self.outpath = outpath
         self.workbook = openpyxl.load_workbook(filename=outpath)
 
-    def makenamedsheet(self, name, cell="B2"):
+    def makenamedsheet(self, name, cell="A2"):
         "Assume first sheet is template, copy to the end and put name"
         workbook = self.workbook
         template_sheet = workbook.active
@@ -41,7 +42,7 @@ class ExcelMerge():
             for line in datafile:
                 line = line.strip()
                 self.logger.info(f"Creating sheet {line}")
-                self.makenamedsheet(line)
+                self.makenamedsheet(line, self.cell)
 
     def save(self):
         "save the output"
@@ -56,7 +57,9 @@ def main():
     parser.add_argument('template',
                         help="Excel spreadsheet template .xlsx")
     parser.add_argument('data',
-                        help="text file with student names")
+                        help="text file with sheet names")
+    parser.add_argument('--cell', default="B2",
+                        help="cell ID to put the name into")
     ## TODO:  Fix verbosity based upon another argument and logging
     parser.add_argument('--log', default="INFO",
         help='Console log level:  Number or DEBUG, INFO, WARNING, ERROR')
@@ -88,7 +91,7 @@ def main():
     logger.info("Creating prepsheet log file %s", logpath)
 
     # filename pre-processing for output
-    SP = ExcelMerge(args.template, args.data, logger)
+    SP = ExcelMerge(args.template, args.data, logger, args.cell)
     SP.merge()
     SP.save()
     
